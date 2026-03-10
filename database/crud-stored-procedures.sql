@@ -11,6 +11,9 @@ GO
 
 -- ============================================================================
 -- Procedure: InsertBranch
+-- Purpose: Insert a new branch into the database
+-- Inputs: @BranchName (NVARCHAR), @Location (NVARCHAR)
+-- Outputs: Returns the newly created BranchID
 -- ============================================================================
 CREATE PROCEDURE InsertBranch
     @BranchName NVARCHAR(100),
@@ -35,6 +38,9 @@ GO
 
 -- ============================================================================
 -- Procedure: UpdateBranch
+-- Purpose: Update an existing branch
+-- Inputs: @BranchID (INT), @BranchName (NVARCHAR), @Location (NVARCHAR)
+-- Outputs: None (returns affected row count)
 -- ============================================================================
 CREATE PROCEDURE UpdateBranch
     @BranchID INT,
@@ -61,6 +67,9 @@ GO
 
 -- ============================================================================
 -- Procedure: DeleteBranch
+-- Purpose: Delete a branch (cascades to related tracks)
+-- Inputs: @BranchID (INT)
+-- Outputs: None (returns affected row count)
 -- ============================================================================
 CREATE PROCEDURE DeleteBranch
     @BranchID INT
@@ -83,6 +92,9 @@ GO
 
 -- ============================================================================
 -- Procedure: SelectBranch
+-- Purpose: Retrieve all branches or a specific branch by ID
+-- Inputs: @BranchID (INT, optional - NULL returns all)
+-- Outputs: Result set of branch records
 -- ============================================================================
 CREATE PROCEDURE SelectBranch
     @BranchID INT = NULL
@@ -109,6 +121,9 @@ GO
 
 -- ============================================================================
 -- Procedure: InsertTrack
+-- Purpose: Insert a new track
+-- Inputs: @TrackName (NVARCHAR), @BranchID (INT), @DurationMonths (INT)
+-- Outputs: Returns the newly created TrackID
 -- ============================================================================
 CREATE PROCEDURE InsertTrack
     @TrackName NVARCHAR(100),
@@ -134,6 +149,9 @@ GO
 
 -- ============================================================================
 -- Procedure: UpdateTrack
+-- Purpose: Update an existing track
+-- Inputs: @TrackID (INT), @TrackName (NVARCHAR), @BranchID (INT), @DurationMonths (INT)
+-- Outputs: None (returns affected row count)
 -- ============================================================================
 CREATE PROCEDURE UpdateTrack
     @TrackID INT,
@@ -162,6 +180,9 @@ GO
 
 -- ============================================================================
 -- Procedure: DeleteTrack
+-- Purpose: Delete a track (cascades to related courses and students)
+-- Inputs: @TrackID (INT)
+-- Outputs: None (returns affected row count)
 -- ============================================================================
 CREATE PROCEDURE DeleteTrack
     @TrackID INT
@@ -184,6 +205,9 @@ GO
 
 -- ============================================================================
 -- Procedure: SelectByBranch
+-- Purpose: Retrieve all tracks for a specific branch
+-- Inputs: @BranchID (INT)
+-- Outputs: Result set of track records
 -- ============================================================================
 CREATE PROCEDURE SelectByBranch
     @BranchID INT
@@ -202,6 +226,9 @@ GO
 
 -- ============================================================================
 -- Procedure: InsertCourse
+-- Purpose: Insert a new course
+-- Inputs: @CourseName (NVARCHAR), @MinDegree (INT), @MaxDegree (INT)
+-- Outputs: Returns the newly created CourseID
 -- ============================================================================
 CREATE PROCEDURE InsertCourse
     @CourseName NVARCHAR(100),
@@ -227,6 +254,9 @@ GO
 
 -- ============================================================================
 -- Procedure: UpdateCourse
+-- Purpose: Update an existing course
+-- Inputs: @CourseID (INT), @CourseName (NVARCHAR), @MinDegree (INT), @MaxDegree (INT)
+-- Outputs: None (returns affected row count)
 -- ============================================================================
 CREATE PROCEDURE UpdateCourse
     @CourseID INT,
@@ -255,6 +285,9 @@ GO
 
 -- ============================================================================
 -- Procedure: DeleteCourse
+-- Purpose: Delete a course (cascades to exams and questions)
+-- Inputs: @CourseID (INT)
+-- Outputs: None (returns affected row count)
 -- ============================================================================
 CREATE PROCEDURE DeleteCourse
     @CourseID INT
@@ -306,6 +339,9 @@ GO
 
 -- ============================================================================
 -- Procedure: InsertInstructor
+-- Purpose: Insert a new instructor
+-- Inputs: @InstructorName (NVARCHAR), @Email (NVARCHAR), @DepartmentNo (INT)
+-- Outputs: Returns the newly created InstructorID
 -- ============================================================================
 CREATE PROCEDURE InsertInstructor
     @InstructorName NVARCHAR(100),
@@ -331,6 +367,9 @@ GO
 
 -- ============================================================================
 -- Procedure: UpdateInstructor
+-- Purpose: Update an existing instructor
+-- Inputs: @InstructorID (INT), @InstructorName (NVARCHAR), @Email (NVARCHAR), @DepartmentNo (INT)
+-- Outputs: None (returns affected row count)
 -- ============================================================================
 CREATE PROCEDURE UpdateInstructor
     @InstructorID INT,
@@ -359,6 +398,9 @@ GO
 
 -- ============================================================================
 -- Procedure: AssignInstructorToCourse
+-- Purpose: Assign an instructor to teach a course
+-- Inputs: @InstructorID (INT), @CourseID (INT)
+-- Outputs: None
 -- ============================================================================
 CREATE PROCEDURE AssignInstructorToCourse
     @InstructorID INT,
@@ -390,6 +432,9 @@ GO
 
 -- ============================================================================
 -- Procedure: InsertStudent
+-- Purpose: Insert a new student
+-- Inputs: @StudentName (NVARCHAR), @Email (NVARCHAR), @Phone (NVARCHAR)
+-- Outputs: Returns the newly created StudentID
 -- ============================================================================
 CREATE PROCEDURE InsertStudent
     @StudentName NVARCHAR(100),
@@ -415,6 +460,9 @@ GO
 
 -- ============================================================================
 -- Procedure: UpdateStudent
+-- Purpose: Update an existing student
+-- Inputs: @StudentID (INT), @StudentName (NVARCHAR), @Email (NVARCHAR), @Phone (NVARCHAR)
+-- Outputs: None (returns affected row count)
 -- ============================================================================
 CREATE PROCEDURE UpdateStudent
     @StudentID INT,
@@ -443,6 +491,9 @@ GO
 
 -- ============================================================================
 -- Procedure: DeleteStudent
+-- Purpose: Delete a student (cascades to exam records)
+-- Inputs: @StudentID (INT)
+-- Outputs: None (returns affected row count)
 -- ============================================================================
 CREATE PROCEDURE DeleteStudent
     @StudentID INT
@@ -465,6 +516,9 @@ GO
 
 -- ============================================================================
 -- Procedure: AssignStudentToTrack
+-- Purpose: Enroll a student in a track
+-- Inputs: @StudentID (INT), @TrackID (INT)
+-- Outputs: None
 -- ============================================================================
 CREATE PROCEDURE AssignStudentToTrack
     @StudentID INT,
@@ -496,6 +550,9 @@ GO
 
 -- ============================================================================
 -- Procedure: InsertQuestion
+-- Purpose: Insert a new question (MCQ or True/False)
+-- Inputs: @CourseID (INT), @QuestionText (NVARCHAR), @QuestionType (NVARCHAR), @Points (INT)
+-- Outputs: Returns the newly created QuestionID
 -- ============================================================================
 CREATE PROCEDURE InsertQuestion
     @CourseID INT,
@@ -522,6 +579,9 @@ GO
 
 -- ============================================================================
 -- Procedure: UpdateQuestion
+-- Purpose: Update an existing question
+-- Inputs: @QuestionID (INT), @QuestionText (NVARCHAR), @Points (INT)
+-- Outputs: None (returns affected row count)
 -- ============================================================================
 CREATE PROCEDURE UpdateQuestion
     @QuestionID INT,
@@ -548,6 +608,9 @@ GO
 
 -- ============================================================================
 -- Procedure: DeleteQuestion
+-- Purpose: Delete a question (cascades to options and model answers)
+-- Inputs: @QuestionID (INT)
+-- Outputs: None (returns affected row count)
 -- ============================================================================
 CREATE PROCEDURE DeleteQuestion
     @QuestionID INT
@@ -574,6 +637,9 @@ GO
 
 -- ============================================================================
 -- Procedure: InsertOption
+-- Purpose: Insert a new option for a question (4 per MCQ, 2 per T/F)
+-- Inputs: @QuestionID (INT), @OptionText (NVARCHAR), @OptionOrder (INT)
+-- Outputs: Returns the newly created OptionID
 -- ============================================================================
 CREATE PROCEDURE InsertOption
     @QuestionID INT,
@@ -603,6 +669,9 @@ GO
 
 -- ============================================================================
 -- Procedure: SetModelAnswer
+-- Purpose: Set the correct answer for a question (one per question)
+-- Inputs: @QuestionID (INT), @OptionID (INT)
+-- Outputs: Returns the newly created ModelAnswerID
 -- ============================================================================
 CREATE PROCEDURE SetModelAnswer
     @QuestionID INT,
