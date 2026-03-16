@@ -310,6 +310,9 @@ GO
 
 --============================================================================
 -- Procedure: SelectByTrack
+-- Purpose: Retrieve all courses for a specific track
+-- Inputs: @TrackID (INT)
+-- Outputs: Result set with CourseID, CourseName, MinDegree, MaxDegree
 -- ============================================================================
 CREATE PROCEDURE SelectByTrack
     @TrackID INT = NULL
