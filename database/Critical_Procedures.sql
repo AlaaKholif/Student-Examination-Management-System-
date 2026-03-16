@@ -1,3 +1,7 @@
+USE ITI_ExamSystem;
+GO
+
+
 -- ============================================================================
 -- Purpose: Generates a random exam for a specific course (REQ-09)
 -- Inputs:  @CourseID (INT) - The ID of the course
