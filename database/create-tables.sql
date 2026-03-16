@@ -151,7 +151,7 @@ CREATE TABLE Exam (
     CreatedDate DATETIME NOT NULL DEFAULT GETDATE(),
     TotalQuestions INT NOT NULL,
     CONSTRAINT FK_Exam_Course FOREIGN KEY (CourseID) 
-        REFERENCES Course(CourseID) ON DELETE CASCADE
+        REFERENCES Course(CourseID) ON DELETE NO ACTION 
 );
 GO
 
@@ -181,9 +181,9 @@ CREATE TABLE StudentExam (
     EndTime DATETIME NOT NULL,
     TotalGrade INT NULL,
     CONSTRAINT FK_StudentExam_Student FOREIGN KEY (StudentID) 
-        REFERENCES Student(StudentID) ON DELETE CASCADE,
+        REFERENCES Student(StudentID) ON DELETE NO ACTION,
     CONSTRAINT FK_StudentExam_Exam FOREIGN KEY (ExamID) 
-        REFERENCES Exam(ExamID) ON DELETE CASCADE
+        REFERENCES Exam(ExamID) ON DELETE NO ACTION
 );
 GO
 -- ============================================================================
@@ -201,33 +201,3 @@ CREATE TABLE StudentAnswer (
     CONSTRAINT FK_StudentAnswer_Option FOREIGN KEY (ChosenOptionID) 
         REFERENCES [Option](OptionID)
 );
-GO
-ALTER TABLE Exam 
-DROP CONSTRAINT FK_Exam_Course ;
-Go
-
-ALTER TABLE Exam 
-ADD CONSTRAINT FK_Exam_Course
-FOREIGN KEY (CourseID)
-REFERENCES Course(CourseID) ON DELETE NO ACTION 
-GO 
-
-ALTER TABLE StudentExam
-DROP CONSTRAINT FK_StudentExam_Student;
-GO
-
-ALTER TABLE StudentExam
-ADD CONSTRAINT FK_StudentExam_Student
-FOREIGN KEY (StudentID)
-REFERENCES Student(StudentID) ON DELETE NO ACTION;
-GO
-
-ALTER TABLE StudentExam
-DROP CONSTRAINT FK_StudentExam_Exam;
-GO
-
-ALTER TABLE StudentExam
-ADD CONSTRAINT FK_StudentExam_Exam
-FOREIGN KEY (ExamID)
-REFERENCES Exam(ExamID) ON DELETE NO ACTION;
-GO
