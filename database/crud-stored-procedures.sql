@@ -635,6 +635,87 @@ END;
 GO
 
 -- ============================================================================
+-- Procedure: InsertFullQuestion
+-- Purpose: Inserts a question, its options, and the model answer in one transaction
+-- Inputs: @CourseID (INT), @QuestionType (VARCHAR), @QuestionText (NVARCHAR), 
+--         @OptA-D (NVARCHAR), @CorrectAnswerChar (CHAR)
+-- Outputs: None (Transaction success or failure)
+-- ============================================================================
+
+CREATE OR ALTER PROCEDURE InsertFullQuestion
+    @CourseID INT,
+    @QuestionType VARCHAR(10), 
+    @QuestionText NVARCHAR(MAX),
+    @OptA NVARCHAR(MAX) = NULL,
+    @OptB NVARCHAR(MAX) = NULL,
+    @OptC NVARCHAR(MAX) = NULL,
+    @OptD NVARCHAR(MAX) = NULL,
+    @CorrectAnswerChar CHAR(1) 
+AS
+BEGIN
+    SET NOCOUNT ON;
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        -- 1. Insert the main Question (We will default Points to 1 for now)
+        INSERT INTO Question (CourseID, QuestionType, QuestionText, Points)
+        VALUES (@CourseID, @QuestionType, @QuestionText, 1);
+
+        DECLARE @NewQID INT = SCOPE_IDENTITY();
+        DECLARE @CorrectOptionID INT;
+        DECLARE @CurrentOptID INT;
+
+        -- 2. Insert Options & Find the Correct One
+        IF @QuestionType = 'MCQ'
+        BEGIN
+            INSERT INTO [Option] (QuestionID, OptionText) VALUES (@NewQID, @OptA);
+            SET @CurrentOptID = SCOPE_IDENTITY();
+            IF @CorrectAnswerChar = 'A' SET @CorrectOptionID = @CurrentOptID;
+
+            INSERT INTO [Option] (QuestionID, OptionText) VALUES (@NewQID, @OptB);
+            SET @CurrentOptID = SCOPE_IDENTITY();
+            IF @CorrectAnswerChar = 'B' SET @CorrectOptionID = @CurrentOptID;
+
+            INSERT INTO [Option] (QuestionID, OptionText) VALUES (@NewQID, @OptC);
+            SET @CurrentOptID = SCOPE_IDENTITY();
+            IF @CorrectAnswerChar = 'C' SET @CorrectOptionID = @CurrentOptID;
+
+            INSERT INTO [Option] (QuestionID, OptionText) VALUES (@NewQID, @OptD);
+            SET @CurrentOptID = SCOPE_IDENTITY();
+            IF @CorrectAnswerChar = 'D' SET @CorrectOptionID = @CurrentOptID;
+        END
+        ELSE IF @QuestionType = 'TF'
+        BEGIN
+            INSERT INTO [Option] (QuestionID, OptionText) VALUES (@NewQID, 'True');
+            SET @CurrentOptID = SCOPE_IDENTITY();
+            IF @CorrectAnswerChar = 'T' SET @CorrectOptionID = @CurrentOptID;
+
+            INSERT INTO [Option] (QuestionID, OptionText) VALUES (@NewQID, 'False');
+            SET @CurrentOptID = SCOPE_IDENTITY();
+            IF @CorrectAnswerChar = 'F' SET @CorrectOptionID = @CurrentOptID;
+        END
+
+        -- 3. Insert the Model Answer
+        IF @CorrectOptionID IS NOT NULL
+        BEGIN
+            INSERT INTO ModelAnswer (QuestionID, OptionID) VALUES (@NewQID, @CorrectOptionID);
+        END
+        ELSE
+        BEGIN
+            RAISERROR('Invalid Correct Answer Character provided.', 16, 1);
+        END
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
+        DECLARE @ErrMsg NVARCHAR(4000) = ERROR_MESSAGE();
+        RAISERROR(@ErrMsg, 16, 1);
+    END CATCH
+END;
+GO
+
+-- ============================================================================
 -- OPTION CRUD PROCEDURES
 -- ============================================================================
 
