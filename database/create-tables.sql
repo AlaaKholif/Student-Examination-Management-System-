@@ -150,6 +150,7 @@ CREATE TABLE Exam (
     CourseID INT NOT NULL,
     CreatedDate DATETIME NOT NULL DEFAULT GETDATE(),
     TotalQuestions INT NOT NULL,
+    DurationMinutes INT NOT NULL DEFAULT 180,
     CONSTRAINT FK_Exam_Course FOREIGN KEY (CourseID) 
         REFERENCES Course(CourseID) ON DELETE NO ACTION 
 );
