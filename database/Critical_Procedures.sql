@@ -15,7 +15,8 @@ CREATE OR ALTER PROCEDURE GenerateExam
     @CourseID INT,
     @ExamName NVARCHAR(150),
     @NumMCQ INT,
-    @NumTF INT
+    @NumTF INT,
+    @DurationMinutes INT = 180 -- Added the Duration parameter with a 3-hour default
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -40,9 +41,9 @@ BEGIN
 
         DECLARE @TotalQuestions INT = @NumMCQ + @NumTF;
 
-        -- Insert into Exam table
-        INSERT INTO Exam (ExamName, CourseID, TotalQuestions)
-        VALUES (@ExamName, @CourseID, @TotalQuestions);
+        -- Updated Insert to include DurationMinutes
+        INSERT INTO Exam (ExamName, CourseID, TotalQuestions, DurationMinutes)
+        VALUES (@ExamName, @CourseID, @TotalQuestions, @DurationMinutes);
 
         DECLARE @NewExamID INT = SCOPE_IDENTITY();
 
@@ -65,7 +66,7 @@ BEGIN
         ) AS SelectedQuestions;
 
         COMMIT TRANSACTION;
-        PRINT 'Exam "' + @ExamName + '" generated successfully with ExamID: ' + CAST(@NewExamID AS VARCHAR);
+        PRINT 'Exam "' + @ExamName + '" generated successfully with ExamID: ' + CAST(@NewExamID AS VARCHAR) + ' (Duration: ' + CAST(@DurationMinutes AS VARCHAR) + ' mins)';
     END TRY
     BEGIN CATCH
         IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
