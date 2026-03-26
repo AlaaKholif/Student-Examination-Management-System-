@@ -2,6 +2,10 @@ package gui;
 
 import javax.swing.*;
 import java.awt.*;
+import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.FlatDarkLaf;
+import javax.swing.UIManager;
+import javax.swing.SwingUtilities;
 
 /**
  * gui.LoginFrame Class
@@ -116,14 +120,25 @@ public class LoginFrame extends JFrame {
                 new InstructorFrame(loggedInId).setVisible(true);
             } else if ("Student".equals(role)) {
                 // (You will do the exact same thing for the StudentFrame later)
-                new StudentFrame().setVisible(true);
+                new StudentFrame(loggedInId).setVisible(true);
             }
         } else {
             JOptionPane.showMessageDialog(this, "Invalid credentials.", "Login Failed", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
     public static void main(String[] args) {
+        // 1. Initialize the modern light theme BEFORE creating the window
+        try {
+            UIManager.setLookAndFeel(new FlatLightLaf());
+
+            // Highly recommended: override the default 90s font with a modern one
+            UIManager.put("defaultFont", new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 14));
+        } catch (Exception ex) {
+            System.err.println("Failed to initialize modern UI theme.");
+        }
+
+        // 2. Launch the application safely
         SwingUtilities.invokeLater(() -> new LoginFrame().setVisible(true));
     }
 }

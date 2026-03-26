@@ -22,7 +22,7 @@ public class InstructorFrame extends JFrame {
 
         setTitle("ITI Exam System - Instructor Panel (ID: " + loggedInInstructorId + ")");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(500, 450);
+        setSize(800, 600);
         setLocationRelativeTo(null);
 
 
@@ -55,15 +55,29 @@ public class InstructorFrame extends JFrame {
         gbc.insets = new Insets(10, 10, 10, 10);
 
         // Form Fields
-        JTextField courseIdField = new JTextField(15);
+        // Create the Dropdown
+        JComboBox<CourseItem> courseComboBox = new JComboBox<>();
+
+        // Fetch courses from the database using our existing DAO
+        dao.AdminDAO adminDAO = new dao.AdminDAO();
+        java.util.List<Object[]> courses = adminDAO.getAllCourses();
+
+        for (Object[] row : courses) {
+            // Safely parse the ID and Name
+            int id = Integer.parseInt(row[0].toString());
+            String name = row[1].toString();
+
+            // Add them to the dropdown
+            courseComboBox.addItem(new CourseItem(id, name));
+        }
         JTextField examNameField = new JTextField(15);
         JTextField mcqCountField = new JTextField("5", 15);
         JTextField tfCountField = new JTextField("2", 15);
-        JTextField durationField = new JTextField("180", 15); // Default 3 hours
+        JTextField durationField = new JTextField("60", 15); // Default 1 hours
 
         // Layout the form
-        gbc.gridx = 0; gbc.gridy = 0; panel.add(new JLabel("Course ID:"), gbc);
-        gbc.gridx = 1; panel.add(courseIdField, gbc);
+        gbc.gridx = 0; gbc.gridy = 0; panel.add(new JLabel("Course:"), gbc);
+        gbc.gridx = 1; panel.add(courseComboBox, gbc);
 
         gbc.gridx = 0; gbc.gridy = 1; panel.add(new JLabel("Exam Name:"), gbc);
         gbc.gridx = 1; panel.add(examNameField, gbc);
@@ -85,23 +99,43 @@ public class InstructorFrame extends JFrame {
         // Button Action
         generateButton.addActionListener(e -> {
             try {
-                int courseId = Integer.parseInt(courseIdField.getText());
-                String examName = examNameField.getText();
-                int mcq = Integer.parseInt(mcqCountField.getText());
-                int tf = Integer.parseInt(tfCountField.getText());
-                int duration = Integer.parseInt(durationField.getText());
+                // 1. Safely extract the ID from the selected dropdown item
+                CourseItem selectedCourse = (CourseItem) courseComboBox.getSelectedItem();
+                if (selectedCourse == null) {
+                    JOptionPane.showMessageDialog(this, "Please select a course.", "Input Error", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                int courseId = selectedCourse.getId();
 
+                // 2. Grab the rest of the text fields
+                String examName = examNameField.getText().trim();
+                if (examName.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Please enter an Exam Name.", "Input Error", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
+                int mcq = Integer.parseInt(mcqCountField.getText().trim());
+                int tf = Integer.parseInt(tfCountField.getText().trim());
+                int duration = Integer.parseInt(durationField.getText().trim());
+
+                // 3. Send to database
                 ExamDAO dao = new ExamDAO();
                 boolean success = dao.generateExam(courseId, examName, mcq, tf, duration);
 
                 if (success) {
                     JOptionPane.showMessageDialog(this, "Exam generated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                    examNameField.setText(""); // clear field
+                    // Clear all fields so they can quickly generate another one
+                    examNameField.setText("");
+                    mcqCountField.setText("");
+                    tfCountField.setText("");
+                    durationField.setText("");
+                    courseComboBox.setSelectedIndex(0); // Reset dropdown to the first course
                 } else {
-                    JOptionPane.showMessageDialog(this, "Failed to generate exam. Check Course ID and available questions.", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Failed to generate exam. Ensure the question bank has enough questions for this course.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "Please enter valid numbers for ID, counts, and duration.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                // Now this error ONLY triggers if they mess up the MCQ, T/F, or Duration boxes
+                JOptionPane.showMessageDialog(this, "Please enter valid numbers for counts and duration.", "Input Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -207,7 +241,21 @@ public class InstructorFrame extends JFrame {
         gbc.insets = new Insets(5, 5, 5, 5);
 
         // Fields
-        JTextField courseIdField = new JTextField();
+        // Create the Dropdown
+        JComboBox<CourseItem> courseComboBox = new JComboBox<>();
+
+        // Fetch courses from the database using our existing DAO
+        dao.AdminDAO adminDAO = new dao.AdminDAO();
+        java.util.List<Object[]> courses = adminDAO.getAllCourses();
+
+        for (Object[] row : courses) {
+            // Safely parse the ID and Name
+            int id = Integer.parseInt(row[0].toString());
+            String name = row[1].toString();
+
+            // Add them to the dropdown
+            courseComboBox.addItem(new CourseItem(id, name));
+        }
         JComboBox<String> typeCombo = new JComboBox<>(new String[]{"MCQ", "TF"});
         JTextArea questionTextField = new JTextArea(3, 20);
         questionTextField.setLineWrap(true);
@@ -237,7 +285,7 @@ public class InstructorFrame extends JFrame {
         // Add components to dialog layout
         int row = 0;
         gbc.gridx = 0; gbc.gridy = row; dialog.add(new JLabel("Course ID:"), gbc);
-        gbc.gridx = 1; dialog.add(courseIdField, gbc);
+        gbc.gridx = 1; dialog.add(courseComboBox, gbc);
 
         row++; gbc.gridx = 0; gbc.gridy = row; dialog.add(new JLabel("Type:"), gbc);
         gbc.gridx = 1; dialog.add(typeCombo, gbc);
@@ -266,23 +314,44 @@ public class InstructorFrame extends JFrame {
         dialog.add(saveButton, gbc);
 
         saveButton.addActionListener(e -> {
-            try {
-                int courseId = Integer.parseInt(courseIdField.getText());
-                String type = (String) typeCombo.getSelectedItem();
-                String text = questionTextField.getText();
-                String correct = (String) correctCombo.getSelectedItem();
+            // 1. Safely extract the ID from the selected dropdown item
+            CourseItem selectedCourse = (CourseItem) courseComboBox.getSelectedItem();
+            if (selectedCourse == null) {
+                JOptionPane.showMessageDialog(dialog, "Please select a course.", "Input Error", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            int courseId = selectedCourse.getId();
 
-                dao.QuestionDAO dao = new dao.QuestionDAO();
-                boolean success = dao.insertQuestion(courseId, type, text, optAField.getText(), optBField.getText(), optCField.getText(), optDField.getText(), correct);
+            // 2. Grab the rest of the inputs
+            String type = (String) typeCombo.getSelectedItem();
+            String text = questionTextField.getText().trim();
+            String correct = (String) correctCombo.getSelectedItem();
 
-                if (success) {
-                    JOptionPane.showMessageDialog(dialog, "Question saved successfully!");
-                    dialog.dispose(); // Close wizard
-                } else {
-                    JOptionPane.showMessageDialog(dialog, "Database error. Check constraints.", "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(dialog, "Invalid Course ID.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            // 3. Validation: Prevent saving empty questions
+            if (text.isEmpty()) {
+                JOptionPane.showMessageDialog(dialog, "Question text cannot be empty.", "Input Error", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            // 4. Send to database
+            dao.QuestionDAO dao = new dao.QuestionDAO();
+            boolean success = dao.insertQuestion(
+                    courseId,
+                    type,
+                    text,
+                    optAField.getText().trim(),
+                    optBField.getText().trim(),
+                    optCField.getText().trim(),
+                    optDField.getText().trim(),
+                    correct
+            );
+
+            // 5. Handle the result
+            if (success) {
+                JOptionPane.showMessageDialog(dialog, "Question saved successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                dialog.dispose(); // Close wizard smoothly
+            } else {
+                JOptionPane.showMessageDialog(dialog, "Database error. Could not save the question. Check constraints.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 
