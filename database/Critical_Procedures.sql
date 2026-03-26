@@ -16,7 +16,7 @@ CREATE OR ALTER PROCEDURE GenerateExam
     @ExamName NVARCHAR(150),
     @NumMCQ INT,
     @NumTF INT,
-    @DurationMinutes INT = 180 -- Added the Duration parameter with a 3-hour default
+    @DurationMinutes INT = 60 -- Added the Duration parameter with a 1-hour default
 AS
 BEGIN
     SET NOCOUNT ON;
