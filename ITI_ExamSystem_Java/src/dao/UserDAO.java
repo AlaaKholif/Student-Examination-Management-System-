@@ -20,11 +20,8 @@ public class UserDAO {
         } else if ("Instructor".equals(role)) {
             query = "SELECT InstructorID FROM Instructor WHERE Email = ? AND Password = ?";
         } else if ("Admin".equals(role)) {
-            // If you don't have an Admin table yet, we can hardcode a master login for testing
-            if ("admin@iti.com".equals(email) && "admin123".equals(password)) {
-                return 999;
-            }
-            return -1;
+            // Updated: Now points to the actual Admin table in SQL Server
+            query = "SELECT AdminID FROM Admin WHERE Email = ? AND Password = ?";
         }
 
         // Execute the query securely using PreparedStatement to prevent SQL injection

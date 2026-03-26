@@ -70,4 +70,44 @@ public class ReportDAO {
 
         return courseData;
     }
+    /**
+     * Calls the Report_StudentGrades stored procedure.
+     * Returns a list of grades for a specific student.
+     */
+    /**
+     * Calls the Report_StudentGrades stored procedure.
+     * Returns a list of grades for a specific student.
+     */
+    public List<Object[]> getStudentGrades(int studentId) {
+        List<Object[]> gradeData = new ArrayList<>();
+        String call = "{call Report_StudentGrades(?)}";
+
+        try (java.sql.Connection conn = DatabaseConnection.getConnection();
+             java.sql.CallableStatement cstmt = conn.prepareCall(call)) {
+
+            cstmt.setInt(1, studentId);
+            java.sql.ResultSet rs = cstmt.executeQuery();
+
+            while (rs.next()) {
+                Object[] row = new Object[5];
+                row[0] = rs.getString("CourseName");
+                row[1] = rs.getString("ExamName");
+
+                // Matches your teammate's exact column names
+                row[2] = rs.getInt("TotalGrade");
+                row[3] = rs.getInt("MaxDegree");
+
+                // Grab the pre-calculated percentage from SQL and add the % sign
+                double percentage = rs.getDouble("Percentage");
+                row[4] = String.format("%.2f%%", percentage);
+
+                gradeData.add(row);
+            }
+
+        } catch (java.sql.SQLException e) {
+            System.err.println("Error fetching student grades: " + e.getMessage());
+        }
+
+        return gradeData;
+    }
 }
