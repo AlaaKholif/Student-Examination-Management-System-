@@ -52,7 +52,7 @@ public class LoginFrame extends JFrame {
         // Username label and field
         gbc.gridx = 0;
         gbc.gridy = 2;
-        JLabel usernameLabel = new JLabel("Username:");
+        JLabel usernameLabel = new JLabel("Email:");
         mainPanel.add(usernameLabel, gbc);
         
         gbc.gridx = 1;
