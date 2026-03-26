@@ -39,7 +39,7 @@ GO
 -- SECTION 4: LINK TRACKS TO COURSES
 -- ============================================================================
 INSERT INTO Track_Course (TrackID, CourseID) VALUES 
-    (1, 4), (1, 5), (1, 6),  -- Web Development
+    (1, 1), (1, 5), (1, 6),  -- Web Development
     (2, 1), (2, 2), (2, 3),  -- Database Administration
     (3, 4), (3, 6),          -- Mobile Development
     (4, 1), (4, 2),          -- Cloud Computing
