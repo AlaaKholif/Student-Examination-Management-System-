@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * LoginFrame Class
+ * gui.LoginFrame Class
  * Purpose: Main login screen for the application
  * Allows users to select their role (Admin, Instructor, Student)
  */
@@ -92,27 +92,34 @@ public class LoginFrame extends JFrame {
      * For demo purposes, accepts any non-empty username/password
      */
     private void handleLogin() {
-        String username = usernameField.getText();
+        String email = usernameField.getText(); // Note: Instruct users to use their Email here
         String password = new String(passwordField.getPassword());
         String role = (String) roleComboBox.getSelectedItem();
-        
-        if (username.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please enter username and password", "Error", JOptionPane.ERROR_MESSAGE);
+
+        if (email.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter both email and password.", "Input Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        
-        // For demo: accept any credentials
-        // In production, validate against database
-        
-        // Open appropriate panel based on role
-        this.setVisible(false);
-        
-        if ("Admin".equals(role)) {
-            new AdminFrame().setVisible(true);
-        } else if ("Instructor".equals(role)) {
-            new InstructorFrame().setVisible(true);
-        } else if ("Student".equals(role)) {
-            new StudentFrame().setVisible(true);
+
+        // Instantiate the DAO and check the database
+        dao.UserDAO userDAO = new dao.UserDAO();
+        // We get the ID from the database (e.g., it returns 1 for Ahmed)
+        int loggedInId = userDAO.validateLogin(role, email, password);
+
+        if (loggedInId != -1) {
+            this.setVisible(false); // Hide login window
+
+            if ("Admin".equals(role)) {
+                new AdminFrame().setVisible(true);
+            } else if ("Instructor".equals(role)) {
+                // Pass the ID into the constructor we just updated!
+                new InstructorFrame(loggedInId).setVisible(true);
+            } else if ("Student".equals(role)) {
+                // (You will do the exact same thing for the StudentFrame later)
+                new StudentFrame().setVisible(true);
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Invalid credentials.", "Login Failed", JOptionPane.ERROR_MESSAGE);
         }
     }
     
