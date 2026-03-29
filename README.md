@@ -1,6 +1,6 @@
 <div align="center">
   <h1>🎓 Student Examination Management System</h1>
-  <p>A robust, database-centric desktop application designed to streamline the examination process across educational branches.</p>
+  <p>A robust, database-centric desktop application designed to streamline the examination process across iti educational branches.</p>
 </div>
 
 <br />
